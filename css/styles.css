@@ -1,0 +1,123 @@
+/* Some CSS styling */
+#sketchpadapp {
+    /* Prevent nearby text being highlighted when accidentally dragging mouse outside confines of the canvas */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.prediction{
+  font-family: 'Josefin Sans', sans-serif;
+  margin-top: 7.5%;
+}
+
+#confidence{
+  font-family: 'Josefin Sans', sans-serif;
+  margin-top: 7.5%;
+}
+
+#result{
+  font-family: 'Pacifico', cursive;
+  font-size: 5rem;
+}
+
+#sketchpad {
+    height:350px;
+    width:350px;
+    border:2px solid #888;
+    border-radius:4px;
+}
+
+#source{
+  padding: 0 100px;
+  text-align: center;
+  margin-bottom: 10%;
+}
+
+#title{
+  padding: 1.5% 15%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+body {
+  overflow: hidden;
+}
+
+.buttons_div{
+  margin-top: 10px;
+}
+
+.heading{
+  width: 90vw;
+  text-align: center;
+  position: relative;
+  color: white;
+  background-color:#6871B1;
+  padding-top: 1%;
+  padding-bottom: 1%;
+  font-family: "Audiowide", sans-serif;
+}
+.heading-sp{
+  color: yellow;
+}
+
+.source-h2{
+  text-align: center;
+  font-family: 'Pacifico', cursive;
+  font-size: 2rem;
+}
+
+hr {
+  border: dotted #808080 6px;
+  border-bottom: none;
+  width: 4%;
+  margin: 50px auto;
+  margin-bottom: 100px;
+}
+
+a:link {
+  color: white;
+  text-decoration: none;
+}
+
+a:visited {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover {
+  color: white;
+  text-decoration: none;
+}
+
+a:active {
+  color: white;
+  text-decoration: none;
+}
+
+p{
+  font-family: 'Source Code Pro', monospace,sans-serif;
+  margin-top: 1%;
+}
+
+table.result > tbody > tr:nth-child(odd) {
+  background-color: mistyrose;
+}
+
+table.result > tbody > tr:first-child {
+  background-color: white;
+}
+
+
+table.result > tbody > tr > td {
+  border-radius: 0;
+}
+
+table th, td {
+  border: none;
+  padding: 5px;
+  text-align: center;
+}
