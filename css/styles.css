@@ -12,6 +12,13 @@
   font-family: 'Josefin Sans', sans-serif;
   margin-top: 7.5%;
 }
+.score{
+  color: #4CAF50;
+  font-weight: bold;
+}
+.answer {
+    background-color: #4CAF50;
+}
 
 #confidence{
   font-family: 'Josefin Sans', sans-serif;
