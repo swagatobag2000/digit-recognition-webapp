@@ -1,21 +1,23 @@
 var canvas,ctx;
-var mouseX,mouseY,isMouseDown= false;
+var mouseX,mouseY,isMouseDown = false;
 var touchX,touchY;
 var isResultDivPresent = false;
-var base_url = window.location.origin;
 let model;
+
+
+//the base url of website in which our web app is deployed is obtained from window.location.origin the json file is loaded using async function
+var base_url = window.location.origin;
+
 
 /* Loading the Model */
 
-//the base url of website in which our 
-//web app is deployed is obtained from window.location.origin
-//the json file is loaded using async function
-
 (async function(){  
-    console.log("model loading...");  
-    // model = await tf.loadLayersModel("https://maneprajakta.github.io/Digit_Recognition_Web_App/models/model.json")
+    // console.log("Model loading...");  
+    // for local testing
+    // model = await tf.loadLayersModel("https://swagatobag2000.github.io/digit-recognition-webapp/models/model.json")
+    // for deployment
     model = await tf.loadLayersModel("../models/model.json");
-    console.log("model loaded..");
+    // console.log("Model loaded..");
 })();
 
 
@@ -147,49 +149,23 @@ function clear(){
 document.getElementById('clear_button').addEventListener("click", clear);
 
 
-//integrating  CANVAS  with CNN MODEL
+/*preprocessing image from canvas*/
 
-
-
-
-//preprocessing model
-
-/*
-the digit sketched is passed as image to model
-so as to predict the value of it
-
+/* resizing the input image to target size of (1, 28, 28) 
+tf.browser.fromPixels() method -> to create a tensor that will flow into the first layer of the model
+tf.image.resizeNearestNeighbor() -> resizes a batch of 3D images to a new shape
+tf.mean() -> used to compute the mean of elements across the dimensions of the tensor
+tf.toFloat() -> casts the array to type float
+tensor.div() -> used to divide the array or tensor by the maximum RGB value(255)
 */
 
 function preprocessCanvas(image) { 
-   
-    //resizing the input image to target size of (1, 28, 28) 
-    //tf.browser.fromPixels() method, to create a tensor that will flow into the first layer of the model
-    //tf.image.resizeNearestNeighbor() function resizes a batch of 3D images to a new shape
-    //tf.mean() function is used to compute the mean of elements across the dimensions of the tensor
-    //tf.toFloat() function casts the array to type float
-    //The tensor.div() function is used to divide the array or tensor by the maximum RGB value(255)
     let tensor = tf.browser.fromPixels(image).resizeNearestNeighbor([28, 28]).mean(2).expandDims(2).expandDims().toFloat(); 
     // console.log(tensor.shape); 
     return tensor.div(255.0);
 }
 
-//Prediction
-//canvas.toDataURL() : returns 
-//image in format specified default png
-//than send to preprocess function
-//await makes program wait until mmodel prediction
-//displayLabel to display result
-// document.getElementById('predict_button').addEventListener("click",async function(){     
-//     var imageData = canvas.toDataURL();    
-//     let tensor = preprocessCanvas(canvas); 
-//     console.log(tensor)   
-//     let predictions = await model.predict(tensor).data();  
-//     console.log(predictions)  
-//     let results = Array.from(predictions);    
-//     displayLabel(results);    
-//     console.log(results);
-// });
-
+/*Clear the previous Output*/
 
 function clearAll(){
     const result_div_list = document.getElementById("result");
@@ -207,7 +183,8 @@ function clearAll(){
     }
 }
 
-//output
+/* output and labelling*/
+
 async function displayLabel(data) { 
     var maxElement = Math.max(...data);    
     var maxIndex = data.indexOf(maxElement);   
@@ -251,6 +228,4 @@ async function displayLabel(data) {
         }
     }
     isResultDivPresent = true;
-    
-// document.getElementById('confidence').innerText = "Confidence: "+(max*100).toFixed(2) + "%";
 }
