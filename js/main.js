@@ -1,6 +1,23 @@
 var canvas,ctx;
 var mouseX,mouseY,isMouseDown= false;
 var touchX,touchY;
+var isResultDivPresent = false;
+var base_url = window.location.origin;
+let model;
+
+/* Loading the Model */
+
+//the base url of website in which our 
+//web app is deployed is obtained from window.location.origin
+//the json file is loaded using async function
+
+(async function(){  
+    console.log("model loading...");  
+    model = await tf.loadLayersModel("https://maneprajakta.github.io/Digit_Recognition_Web_App/models/model.json")
+    // model = await tf.loadLayersModel("../models/model.json");
+    console.log("model loaded..");
+})();
+
 
 /* fucnction for interacting with canvas */
 
@@ -15,7 +32,7 @@ function init(){
         //if mousedown than call function sketchPad_mouseDown.false means bubble phase
         canvas.addEventListener('mousedown', sketchpad_mouseDown, false);          
         canvas.addEventListener('mousemove', sketchpad_mouseMove, false);          
-        window.addEventListener('mouseup', sketchpad_mouseUp, false);           
+        canvas.addEventListener('mouseup', sketchpad_mouseUp, false);           
         canvas.addEventListener('touchstart', sketchpad_touchStart,false);
         canvas.addEventListener('touchmove', sketchpad_touchMove, false); 
     }
@@ -52,13 +69,15 @@ function sketchpad_mouseDown() {
 }
 
 /* when mouse is released it set's mousedown back to false and start prediction */
-function sketchpad_mouseUp() {    
+async function sketchpad_mouseUp() {    
     isMouseDown = false;
-    console.log("Released")
+    let tensor = preprocessCanvas(canvas); 
+    let predictions = await model.predict(tensor).data();  
+    let results = Array.from(predictions);    
+    displayLabel(results);    
 }
 
-/* when mouse is moved in either direction it gets current position of mouse from getMousePos(e)
-if mouseDown than call draw */
+/* when mouse is moved in either direction it gets current position of mouse from getMousePos(e) and if mouseDown than call draw */
 
 function sketchpad_mouseMove(e) {
     getMousePos(e);
@@ -121,6 +140,8 @@ function clear(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);  
     ctx.fillStyle = "white"; 
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    clearAll();
+    isResultDivPresent = false;
 }
 
 document.getElementById('clear_button').addEventListener("click", clear);
@@ -129,19 +150,7 @@ document.getElementById('clear_button').addEventListener("click", clear);
 //integrating  CANVAS  with CNN MODEL
 
 
-//loading the model
 
-//the base url of website in which our 
-//web app is deployed is obtained from window.location.origin
-//the json file is loaded using async function
-
-var base_url = window.location.origin;
-let model;
-async function loadModel(){  
-    console.log("model loading...");  
-    model = await tf.loadLayersModel("https://maneprajakta.github.io/Digit_Recognition_Web_App/models/model.json")
-    console.log("model loaded..");
-};
 
 //preprocessing model
 
@@ -160,7 +169,7 @@ function preprocessCanvas(image) {
     //tf.toFloat() function casts the array to type float
     //The tensor.div() function is used to divide the array or tensor by the maximum RGB value(255)
     let tensor = tf.browser.fromPixels(image).resizeNearestNeighbor([28, 28]).mean(2).expandDims(2).expandDims().toFloat(); 
-    console.log(tensor.shape); 
+    // console.log(tensor.shape); 
     return tensor.div(255.0);
 }
 
@@ -170,29 +179,78 @@ function preprocessCanvas(image) {
 //than send to preprocess function
 //await makes program wait until mmodel prediction
 //displayLabel to display result
-document.getElementById('predict_button').addEventListener("click",async function(){     
-    var imageData = canvas.toDataURL();    
-    let tensor = preprocessCanvas(canvas); 
-    console.log(tensor)   
-    let predictions = await model.predict(tensor).data();  
-    console.log(predictions)  
-    let results = Array.from(predictions);    
-    displayLabel(results);    
-    console.log(results);
-});
+// document.getElementById('predict_button').addEventListener("click",async function(){     
+//     var imageData = canvas.toDataURL();    
+//     let tensor = preprocessCanvas(canvas); 
+//     console.log(tensor)   
+//     let predictions = await model.predict(tensor).data();  
+//     console.log(predictions)  
+//     let results = Array.from(predictions);    
+//     displayLabel(results);    
+//     console.log(results);
+// });
 
+
+function clearAll(){
+    const result_div_list = document.getElementById("result");
+    while (result_div_list.firstChild) {
+        result_div_list.removeChild(result_div_list.lastChild);
+    }
+    isResultDivPresent = false;
+    var tdList = document.getElementsByTagName('td');
+    for(var i=0; i< tdList.length; i++){ 
+        tdList[i].innerHTML = '';
+        if(tdList[i].classList.contains("answer")){
+            tdList[i].classList.remove("answer");
+            document.getElementsByTagName('th')[i+2].classList.remove("answer");
+        }
+    }
+}
 
 //output
-function displayLabel(data) { 
-    var max = data[0];    
-    console.log(Math.max(...data));
-    var maxIndex = 0;     
-    for (var i = 1; i < data.length; i++) {        
-      if (data[i] > max) {            
-        maxIndex = i;            
-        max = data[i];        
-      }
+async function displayLabel(data) { 
+    var maxElement = Math.max(...data);    
+    var maxIndex = data.indexOf(maxElement);   
+    
+    console.log("Max Element: ",maxElement);
+    console.log("Max Element Index: ",maxIndex);
+
+    const resultDiv1 = document.createElement('div');
+    resultDiv1.className = 'col-lg-6 col-md-6 col-sm-12'
+    resultDiv1.innerHTML = `
+    <h2 id="prediction_heading" class="prediction">
+        Prediction: 
+        <span class="score">`
+            +maxIndex+
+        `</span>
+    </h2>`;
+
+    const resultDiv2 = document.createElement('div');
+    resultDiv2.className = 'col-lg-6 col-md-6 col-sm-12'
+    resultDiv2.innerHTML = `
+    <h2 id="confidence" class="prediction">
+        Confidence:
+        <span class="score">`
+            +(maxElement*100).toFixed(2)+
+        `%</span>
+    </h2>`;
+
+    if(isResultDivPresent){
+        clearAll();
     }
-document.getElementById('result').innerHTML = maxIndex;  
-document.getElementById('confidence').innerHTML = "Confidence: "+(max*100).toFixed(2) + "%";
+
+    document.getElementById('result').appendChild(resultDiv1); 
+    document.getElementById('result').appendChild(resultDiv2); 
+
+    var tdList = document.getElementsByTagName('td');
+    for(var i=0; i< tdList.length; i++){ 
+        tdList[i].innerHTML = (data[i]).toFixed(2);
+        if(i == maxIndex){
+            tdList[i].classList.add("answer");
+            document.getElementsByTagName('th')[i+2].classList.add("answer");
+        }
+    }
+    isResultDivPresent = true;
+    
+// document.getElementById('confidence').innerText = "Confidence: "+(max*100).toFixed(2) + "%";
 }
