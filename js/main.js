@@ -13,8 +13,8 @@ let model;
 
 (async function(){  
     console.log("model loading...");  
-    model = await tf.loadLayersModel("https://maneprajakta.github.io/Digit_Recognition_Web_App/models/model.json")
-    // model = await tf.loadLayersModel("../models/model.json");
+    // model = await tf.loadLayersModel("https://maneprajakta.github.io/Digit_Recognition_Web_App/models/model.json")
+    model = await tf.loadLayersModel("../models/model.json");
     console.log("model loaded..");
 })();
 
