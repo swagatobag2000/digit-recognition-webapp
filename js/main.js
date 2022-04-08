@@ -14,9 +14,9 @@ var base_url = window.location.origin;
 (async function(){  
     // console.log("Model loading...");  
     // for local testing
-    // model = await tf.loadLayersModel("https://swagatobag2000.github.io/digit-recognition-webapp/models/model.json")
+    model = await tf.loadLayersModel("https://swagatobag2000.github.io/digit-recognition-webapp/models/model.json")
     // for deployment
-    model = await tf.loadLayersModel("../models/model.json");
+    // model = await tf.loadLayersModel("../models/model.json");
     // console.log("Model loaded..");
 })();
 
