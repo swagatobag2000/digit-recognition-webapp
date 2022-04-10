@@ -32,10 +32,10 @@
 }
 
 #sketchpad {
-    height:350px;
-    width:350px;
-    border:2px solid #888;
-    border-radius:4px;
+  /* width: 337px;
+  height: 337px; */
+  border:2px solid #888;
+  border-radius:4px;
 }
 
 #source{
@@ -59,7 +59,8 @@ body {
 }
 
 .heading{
-  width: 90vw;
+  width: 50vw;
+  max-lines: 2;
   text-align: center;
   position: relative;
   color: white;
